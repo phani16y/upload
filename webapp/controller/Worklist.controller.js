@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (BaseController, JSONModel, formatter, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageBox",
+], function (BaseController, JSONModel, formatter, Filter, FilterOperator,MessageBox) {
     "use strict";
 
     return BaseController.extend("upload.controller.Worklist", {
@@ -40,7 +41,17 @@ sap.ui.define([
         /* =========================================================== */
         /* event handlers                                              */
         /* =========================================================== */
-
+        onDelete : function (oEvent) {
+            debugger;
+            var path = this.getView().byId("table").getSelectedContextPaths(true)
+            var oModel = this.getView().getModel();
+            oModel.remove(path[0], {success: function(data) {
+                MessageBox.success( "Emp " + " Deleted Successfully " );
+                 }, error: function(e) {
+                    debugger;
+                MessageBox.error(  " Error Occurred " );
+                }});
+        },
         /**
          * Triggered by the table's 'updateFinished' event: after new table
          * data is available, this handler method updates the table counter.
@@ -79,7 +90,7 @@ sap.ui.define([
         },
 
         onCreate: function (oEvent) {
-            debugger;
+ 
             this.getRouter().navTo("Create",{CreateId:oEvent.getId()});
         },
 

@@ -31,7 +31,7 @@
                 busyIndicatorDelay="{worklistView>/tableBusyDelay}"
                 growing="true"
                 growingScrollToLoad="true"
-                updateFinished=".onUpdateFinished">
+                updateFinished=".onUpdateFinished" mode="SingleSelectLeft">
 
                 <headerToolbar>
                     <OverflowToolbar>
@@ -42,7 +42,7 @@
                         <ToolbarSpacer />
                         <Button id = "Ex" text="Excel Upload" press="onUpload" />
                         <Button text="Create" press="onCreate" />
-                        <Button text="Delete" press="onPress" />
+                        <Button text="Delete" press="onDelete" />
                         <SearchField
                             id="searchField"
                             tooltip="{i18n>worklistSearchTooltip}"
