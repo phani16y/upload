@@ -2,8 +2,9 @@ sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/routing/History",
-    "../model/formatter"
-], function (BaseController, JSONModel, History, formatter) {
+    "../model/formatter",
+    "sap/m/MessageBox",
+], function (BaseController, JSONModel, History, formatter,MessageBox) {
     "use strict";
 
     return BaseController.extend("upload.controller.Object", {
@@ -61,7 +62,20 @@ sap.ui.define([
 		},
 
 		handleSavePress : function () {
-			this._toggleButtonsAndView(false);
+            var oModel = this.getView().getModel();
+            var path = this.getView().getElementBinding().sPath;
+            var uData = this.getView().getModel().getProperty(path);
+            uData.Firstname = this.getView().byId("InputEdit").getValue();
+            uData.Lastname = this.getView().byId("InputEdit2").getValue();
+            uData.Age = this.getView().byId("InputEdit3").getValue();
+            
+            oModel.update(path, uData, {success: function(data) {
+                MessageBox.success( "Emp " + uData.Id + " Updated Successfully " );;
+                 }, error: function(e) {
+                    debugger;
+                MessageBox.error( uData.Id + " Error Occurred " );
+                }}); 
+         this._toggleButtonsAndView(false);
 		},
         _toggleButtonsAndView: function(bEdit)
          {

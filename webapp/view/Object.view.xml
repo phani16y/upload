@@ -36,9 +36,6 @@
 				editable="false"	/>
 		</forms:SimpleForm>	
 
-		<semantic:footerMainAction>
-			<semantic:FooterMainAction text="Save" press="onSave"/>
-		</semantic:footerMainAction>
     </semantic:SemanticPage>
 
 </mvc:View>

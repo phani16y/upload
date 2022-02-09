@@ -135,7 +135,7 @@ sap.ui.define([
             }
             debugger;
             that.getView().getModel("uploadModel").setProperty("/",data);
-            MessageBox.information(count + " Users found in file. Click on Save to load data in IAS");
+            MessageBox.information(count + " Users found in file. Click on Save to load data ");
             //MessageToast.show(count + " Users found in file. Click on Save to load data");
              
             
