@@ -1,0 +1,44 @@
+<mvc:View
+    controllerName="upload.controller.Object"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:forms="sap.ui.layout.form"
+    xmlns:semantic="sap.f.semantic">
+
+    <semantic:SemanticPage
+        id="page"
+        headerPinnable="false"
+        toggleHeaderOnTitleClick="false"
+        busy="{objectView>/busy}"
+        showFooter="true"
+        busyIndicatorDelay="{objectView>/delay}">
+        <semantic:titleHeading>
+            <Title  text="{Firstname}"  level="H2"/>
+        </semantic:titleHeading>
+        <semantic:headerContent>
+					<Button id="edit" text="Edit" enabled="false" press="handleEditPress" />
+					<Button id="save" text="Save" type="Emphasized" visible="false" press="handleSavePress" />
+					<Button id="cancel" text="Cancel" visible="false" press="handleCancelPress" />
+        </semantic:headerContent>
+       	<forms:SimpleForm
+		title="Emp Details" editable="true" layout="ColumnLayout">
+		<Label text="First Name"/>
+        <Input	id="InputEdit" 	class="sapUiSmallMarginBottom" required="true"
+				type="Text"	placeholder="Enter First name"	enabled="true"  value="{Firstname}"
+				 editable ="false"	/>
+		<Label text="Last Name"/>
+		<Input	id="InputEdit2" class="sapUiSmallMarginBottom" 
+				type="Text"	placeholder="Enter product"	enabled="true"  value="{Lastname}"
+				editable="false"	/>
+        <Label text="Age"/>
+		<Input	id="InputEdit3" class="sapUiSmallMarginBottom" 
+				type="Text"	placeholder="Enter Age"	enabled="true"  value="{Age}"
+				editable="false"	/>
+		</forms:SimpleForm>	
+
+		<semantic:footerMainAction>
+			<semantic:FooterMainAction text="Save" press="onSave"/>
+		</semantic:footerMainAction>
+    </semantic:SemanticPage>
+
+</mvc:View>
