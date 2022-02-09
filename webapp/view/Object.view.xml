@@ -10,7 +10,7 @@
         headerPinnable="false"
         toggleHeaderOnTitleClick="false"
         busy="{objectView>/busy}"
-        showFooter="true"
+        showFooter="false"
         busyIndicatorDelay="{objectView>/delay}">
         <semantic:titleHeading>
             <Title  text="{Firstname}"  level="H2"/>

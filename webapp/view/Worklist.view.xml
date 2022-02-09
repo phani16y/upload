@@ -57,6 +57,9 @@
                 </headerToolbar>
 
                 <columns>
+                    <Column id="nameColumn1">
+                        <Text text="Emp Id" id="nameColumnTitle1"/>
+                    </Column>
                     <Column id="nameColumn">
                         <Text text="{i18n>tableNameColumnTitle}" id="nameColumnTitle"/>
                     </Column>
@@ -73,6 +76,8 @@
                         type="Navigation"
                         press=".onPress">
                         <cells>
+                            <ObjectIdentifier
+                                title="{Id}"/>
                             <ObjectIdentifier
                                 title="{Firstname}"/>
                             <ObjectNumber     unit="{Lastname}" />
