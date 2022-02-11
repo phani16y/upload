@@ -9,14 +9,16 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/core/util/Export",
 	"sap/ui/core/util/ExportTypeCSV",
-    "sap/ui/core/routing/History"
-], function (BaseController, JSONModel, formatter, Filter,  FilterOperator, MessageToast, FileUploader, MessageBox, Export, ExportTypeCSV, History ) {
+    "sap/ui/core/routing/History",
+    'sap/ui/export/library',
+	'sap/ui/export/Spreadsheet',
+], function (BaseController, JSONModel, formatter, Filter,  FilterOperator, MessageToast, FileUploader, MessageBox, Export, ExportTypeCSV, History,exportLibrary, Spreadsheet, ) {
 	"use strict";
-
+    var EdmType = exportLibrary.EdmType;
 	return BaseController.extend("upload.controller.Upload", {
 
 		formatter: formatter,       
-
+        
         /** 
 		onNavBack : function() {
 			// eslint-disable-next-line sap-no-history-manipulation
@@ -24,6 +26,11 @@ sap.ui.define([
 		},
 */
         onInit : function () { 
+            var oViewModel = new JSONModel({
+                busy : true,
+                delay : 0
+            });
+
            this._oBusyDialog = new sap.m.BusyDialog(); 
            debugger;
            var oModel = this.getView().getModel("uploadModel");
@@ -32,20 +39,24 @@ sap.ui.define([
            var refresh = that.getView().getModel("uploadModel").setProperty("/",data);
            }
            this.getRouter().getRoute("Upload").attachMatched(this.onRouteMatched, this);
-                     
+           this.setModel(oViewModel, "uploadView");           
         },
 
         onRouteMatched : function (oEvent) {
             debugger;
             window.onhashchange = function () {
-                 if (window.innerDocClick) { 
+            if (window.innerDocClick) { 
 
-                 } 
-                 else { if (window.location.hash === '#/fileUpload') { 
-                     location.reload(); 
-                    } 
-                    }
+            } 
+            else { if (window.location.hash === '#/fileUpload') { 
+                location.reload(); 
+              } 
+              }
+
         }
+        var oViewModel = this.getModel("uploadView");
+        oViewModel.setProperty("/busy", false);
+
     },
         
         onback : function () {
@@ -67,42 +78,64 @@ sap.ui.define([
 
         onDownload : function () {
                 debugger;
-              //  this.getView().getModel("errorLog");
-                var oExport = new Export({
-
-                    // Type that will be used to generate the content. Own ExportType's can be created to support other formats
-                    exportType : new ExportTypeCSV({
-                        separatorChar : ",",
-                        charset : "utf-8"
-                    }),
+                var data = [];var record = {};
+                var aCols, errorline, oSettings, oSheet;
+                aCols = this.createColumnConfig();
+                var fileData = this.getView().getModel("uploadModel").getData();
+                errorline = this.getView().getModel("errorLog").getProperty('/');
+                var count = errorline.length;
+                for (var i = 0; i < count ; i++) {
+                  var n = errorline[i]["line"];
+                  var fileData = this.getView().getModel("uploadModel").getData();
+                  record = fileData[n];
+                  data.push(record);
+                }
+                oSettings = {
+                    workbook: { columns: aCols },
+                    dataSource: data,
+                    fileName: "Error Log"
+                };
     
-                    // Pass in the model created above
-                    models : this.getView().getModel("errorLog"),
-    
-                    // binding information for the rows aggregation
-                    rows : {
-                        path : "/"
-                    },   
-                    // column definitions with column name and binding info for the content  
-                    columns : [{
-                        name : "Error",
-                        template : {
-                            content : "{msg}"
-                        }
-                    }]
-                });
-    
-                // download exported file
-                oExport.saveFile().catch(function(oError) {
-                    MessageBox.error("Error when downloading data. Browser might not be supported!\n\n" + oError);
-                }).then(function() {
-                    oExport.destroy();
-                });
+                oSheet = new Spreadsheet(oSettings);
+                oSheet.build()
+                    .then( function() {
+                        MessageToast.show('Spreadsheet export has finished');
+                    })
+                    .finally(oSheet.destroy);
         },
 
-        
+        // Colums
+
+        createColumnConfig: function() {
+			return [
+				{
+					label: 'Firstname',
+					property: 'Firstname',
+					width: '25'
+				},
+                {
+					label: 'lastname',
+					property: 'lastname',
+					width: '25'
+				},
+                {
+					label: 'Age',
+					property: 'Age',
+					scale: 0
+				},
+                {
+					label: 'Role',
+					property: 'Role',
+					width: '25'
+				},
+
+                ];
+		},
+
+        //End of colums
         onUpload : function(oEvent) {
             debugger;
+        var oViewModel = this.getModel("uploadView");    
         var oFileUploader = this.getView().byId("idfileUploader");
         
         var domref = oFileUploader.getFocusDomRef();
@@ -112,6 +145,7 @@ sap.ui.define([
         this.fileType = file.type;
 
         var reader = new FileReader();
+        oViewModel.setProperty("/busy", true);
         reader.onload = function(e) {
             //get access to content of the file
             debugger;
@@ -137,9 +171,8 @@ sap.ui.define([
             that.getView().getModel("uploadModel").setProperty("/",data);
             MessageBox.information(count + " Users found in file. Click on Save to load data ");
             //MessageToast.show(count + " Users found in file. Click on Save to load data");
-             
-            
-      
+            oViewModel.setProperty("/busy", false);   
+          
         };
     // File Reader to read the file
        // reader.readAsDataURL(file);
@@ -163,71 +196,46 @@ sap.ui.define([
         onSave : function () {
             debugger;
             var t = this;
-            var message = false;
             var data = [];
-          var fileData = this.getView().getModel("uploadModel").getData();
+            var eline = 0;
+            var message = false;
+            var oViewModel = this.getModel("uploadView");
+            var oModel = this.getView().getModel();
+            debugger;
+            oModel.setUseBatch(true);
+            oViewModel.setProperty("/busy", true);
+            var fileData = this.getView().getModel("uploadModel").getData();
             var usercount = fileData.length;
             for (var i = 0; i < usercount ; i++) {
+                var oData = {};
+                oData.Firstname = fileData[i]["Firstname"];
+                oData.Lastname =  fileData[i]["lastname"];
+                oData.Age = fileData[i]["Age"];
+                oData.Role = fileData[i]["Role"];
                 debugger;
-            var username = fileData[i]["User Name"];
-            var displayname = fileData[i]["Display Name"];
-            var family = fileData[i]["Family Name"];
-            var middle = fileData[i]["Family Name"];
-            var emailid = fileData[i].Email;
-
-            this.getView().getModel("createUserbody").setProperty("/userName", username);
-            this.getView().getModel("createUserbody").setProperty("/displayName", displayname);
-            this.getView().getModel("createUserbody").setProperty("/name/familyName", family);
-            this.getView().getModel("createUserbody").setProperty("/name/givenName", middle);
-
-            var emailprop = this.getView().getModel("createUserbody").getProperty("/emails");
-            emailprop[0].value = emailid;
-            var body = JSON.stringify(this.getView().getModel("createUserbody").oData);
-            var sPath = 'IAS/Users';
-            var xurl =  this.getOwnerComponent().getManifestObject().resolveUri(sPath);
-            $.ajax({
-                type: "POST",
-                contentType: "application/scim+json",
-                url: xurl,
-                data: body,
-                success: function (data, txtStatus, jqXHR) {
-                  //  var msg = 'User in IAS with unique id: ' + data.id + ' is created succesfully';
-                    //MessageToast.show(msg);
-                  //  debugger;
-                  //  MessageBox.success(msg);
-                 //   sg }),
-                 /*
-                        beginButton: new Button({
-                            type: ButtonType.Emphasized,
-                            text: "OK",
-                            press: function () {
-                                debugger;
-                                that.close();
-                            }.bind(dialogbox)
-                        })
-                    });
-                    var that = dialogbox;
-                    dialogbox.open(); */
-                },
-                error: function (jqXhr, textStatus, errorThrown) {
-                    var record = {};
-                    record.msg = 'Error:' + jqXhr.responseText;
+                oModel.create("/UXT", oData, {success: function(data) {
+                    debugger; eline = eline + 1;
+                     }, error: function(e) { 
+                    // Download Error Data
+                    var record = {};eline = eline + 1;
+                    debugger;
+                    record.line =  eline - 1;
                     data.push(record);
                     if (t.getView().byId("errorId").getEnabled() === false) {
                          t.getView().byId("errorId").setEnabled(true); 
                          }
-                    debugger;
                     t.getView().getModel("errorLog").setProperty("/",data);
-                    if ( message === false ) {
-                        MessageBox.information("Please download and check Error log for more details");
-                        message = true;
-                    }
-                }
-            })
-
+                    //
+                    }});
             }
-
+            oModel.submitChanges({
+                success: function(data, response) {
+                    oViewModel.setProperty("/busy", false);
+                },
+                error: function(e) {
+                    oViewModel.setProperty("/busy", false);
+                }
+            });
         }
-
 	});
 });

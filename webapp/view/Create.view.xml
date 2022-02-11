@@ -9,9 +9,9 @@
         id="page"
         headerPinnable="false"
         toggleHeaderOnTitleClick="false"
-        busy="{objectView>/busy}"
+        busy="{createView>/busy}"
         showFooter="true"
-        busyIndicatorDelay="{objectView>/delay}">
+        busyIndicatorDelay="{createView>/delay}">
         <semantic:titleHeading>
             <Title  text="{Firstname}"  level="H2"/>
         </semantic:titleHeading>
@@ -25,10 +25,18 @@
 		<Input	id="InputEdit2" class="sapUiSmallMarginBottom" 
 				type="Text"	placeholder="Enter product"	enabled="true"  editable="true"
 					/>
+
         <Label text="Age"/>
-		<Input	id="InputEdit3" class="sapUiSmallMarginBottom" 
-				type="Text"	placeholder="Enter Age"	 enabled="true" editable="true"
+		<Input	id="InputEdit3"  class="sapUiSmallMarginBottom"
+				type="Text"	placeholder="Enter Age"	 enabled="true" editable="true"	/>            
+        <Label text="Role"/>
+		<Input	id="InputEdit4"  class="sapUiSmallMarginBottom"
+				type="Text"	placeholder="Enter Role" enabled="true" editable="true"
 					/>
+         <Label text="Country"/>           
+         <Input	id="InputEdit5" showValueHelp="true" class="sapUiSmallMarginBottom"
+                valueHelpRequest=".onValueHelpRequest" valueHelpOnly="true" 
+				type="Text"	placeholder="Enter Country " enabled="true" editable="true"/>
 		</forms:SimpleForm>	
 
          <semantic:footerCustomActions>

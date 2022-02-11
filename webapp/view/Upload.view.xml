@@ -7,6 +7,7 @@
     <semantic:SemanticPage
         id="page"
         headerPinnable="false" showFooter = "true"
+        busy="{uploadView>/busy}"
         toggleHeaderOnTitleClick="false">
         
         <semantic:titleHeading>
@@ -65,7 +66,7 @@
                         <Text text="Age"></Text>
                     </Column>
                     <Column>
-                        <Text text="Salary"></Text>
+                        <Text text="Role"></Text>
                     </Column>
                 </columns>
 
@@ -75,6 +76,7 @@
                             <ObjectIdentifier  title="{uploadModel>Firstname}"/>
                             <ObjectIdentifier  title="{uploadModel>lastname}" />
                             <ObjectIdentifier  title="{uploadModel>Age}" />
+                            <ObjectIdentifier  title="{uploadModel>Role}" />
                         </cells>
                     </ColumnListItem>
                 </items>

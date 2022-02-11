@@ -4,7 +4,10 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "../model/formatter",
     "sap/m/MessageBox",
-], function (BaseController, JSONModel, History, formatter,MessageBox) {
+    "sap/ui/core/Fragment",
+    "sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator"
+], function (BaseController, JSONModel, History, formatter,MessageBox,Fragment,Filter, FilterOperator) {
     "use strict";
 
     return BaseController.extend("upload.controller.Object", {
@@ -28,6 +31,7 @@ sap.ui.define([
                     delay : 0
                 });
             this.getRouter().getRoute("object").attachPatternMatched(this._onObjectMatched, this);
+            debugger;
             this.setModel(oViewModel, "objectView");
         },
         /* =========================================================== */
@@ -41,7 +45,45 @@ sap.ui.define([
          * If not, it will replace the current entry of the browser history with the worklist route.
          * @public
          */
+		onValueHelpRequest: function (oEvent) {
+			var sInputValue = oEvent.getSource().getValue(),
+				oView = this.getView();
 
+			if (!this._pValueHelpDialog) {
+				this._pValueHelpDialog = Fragment.load({
+					id: oView.getId(),
+					name: "upload.Fragment.ValueHelpDialog",
+					controller: this
+				}).then(function (oDialog) {
+					oView.addDependent(oDialog);
+					return oDialog;
+				});
+			}
+			this._pValueHelpDialog.then(function(oDialog) {
+				// Create a filter for the binding
+				oDialog.getBinding("items").filter([new Filter("Country", FilterOperator.Contains, sInputValue)]);
+				// Open ValueHelpDialog filtered by the input's value
+				oDialog.open(sInputValue);
+			});
+		},
+
+		onValueHelpSearch: function (oEvent) {
+			var sValue = oEvent.getParameter("value");
+			var oFilter = new Filter("Country", FilterOperator.Contains, sValue);
+
+			oEvent.getSource().getBinding("items").filter([oFilter]);
+		},
+
+		onValueHelpClose: function (oEvent) {
+			var oSelectedItem = oEvent.getParameter("selectedItem");
+			oEvent.getSource().getBinding("items").filter([]);
+
+			if (!oSelectedItem) {
+				return;
+			}
+
+			this.byId("InputEdit5").setValue(oSelectedItem.getTitle());
+		},
         handleEditPress : function () {
             debugger;
            //Clone the data
@@ -63,17 +105,21 @@ sap.ui.define([
 
 		handleSavePress : function () {
             var oModel = this.getView().getModel();
+            var oViewModel = this.getModel("objectView");
             var path = this.getView().getElementBinding().sPath;
             var uData = this.getView().getModel().getProperty(path);
             uData.Firstname = this.getView().byId("InputEdit").getValue();
             uData.Lastname = this.getView().byId("InputEdit2").getValue();
             uData.Age = this.getView().byId("InputEdit3").getValue();
-            
+            uData.Role = this.getView().byId("InputEdit4").getValue();
+            //uData.Age = this.getView().byId("InputEdit5").getValue();
+            oViewModel.setProperty("/busy", true);
             oModel.update(path, uData, {success: function(data) {
-                MessageBox.success( "Emp " + uData.Id + " Updated Successfully " );;
+                MessageBox.success( "Emp " + uData.Id + " Updated Successfully " );
+                oViewModel.setProperty("/busy", false);
                  }, error: function(e) {
-                    debugger;
                 MessageBox.error( uData.Id + " Error Occurred " );
+                 oViewModel.setProperty("/busy", false);
                 }}); 
          this._toggleButtonsAndView(false);
 		},
@@ -87,6 +133,8 @@ sap.ui.define([
             oView.byId('InputEdit').setProperty('editable',bEdit);
             oView.byId('InputEdit2').setProperty('editable',bEdit);
             oView.byId('InputEdit3').setProperty('editable',bEdit);
+            oView.byId('InputEdit4').setProperty('editable',bEdit);
+            oView.byId('InputEdit5').setProperty('editable',bEdit);
          },
          
         onNavBack : function() {

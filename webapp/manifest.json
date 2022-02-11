@@ -61,6 +61,9 @@
       "uploadModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
+      "errorLog": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
       "": {
         "dataSource": "mainService",
         "preload": true,

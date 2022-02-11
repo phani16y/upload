@@ -34,6 +34,15 @@
 		<Input	id="InputEdit3" class="sapUiSmallMarginBottom" 
 				type="Text"	placeholder="Enter Age"	enabled="true"  value="{Age}"
 				editable="false"	/>
+        <Label text="Role"/>
+        <Input	id="InputEdit4" class="sapUiSmallMarginBottom" 
+				type="Text"	placeholder="Enter Role"	enabled="true"  value="{Role}"
+				editable="false" />
+         <Label text="Country"/>           
+         <Input	id="InputEdit5" showValueHelp="true" class="sapUiSmallMarginBottom"
+                valueHelpRequest=".onValueHelpRequest" valueHelpOnly="true" 
+				type="Text"	placeholder="Enter Country " enabled="true" editable="false"/>
+		
 		</forms:SimpleForm>	
 
     </semantic:SemanticPage>
